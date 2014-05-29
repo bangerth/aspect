@@ -25,6 +25,7 @@
 #include <deal.II/base/parameter_handler.h>
 
 #include <dirent.h>
+#include <stdlib.h>
 
 
 namespace aspect
@@ -603,21 +604,27 @@ namespace aspect
     else if (output_directory[output_directory.size()-1] != '/')
       output_directory += "/";
 
-    // verify that the output directory actually exists. trying to
-    // write to a non-existing output directory will eventually
-    // produce an error but one not easily understood. since
-    // this is no error where a nicely formatted error message
-    // with a backtrace is likely very useful, just print an
-    // error and exit
+    // verify that the output directory actually exists. if it doesn't, create
+    // it.
     if (opendir(output_directory.c_str()) == NULL)
       {
         std::cerr << "\n"
                   << "-----------------------------------------------------------------------------\n"
                   << "The output directory <" << output_directory
-                  << "> provided in the input file appears not to exist!\n"
-                  << "-----------------------------------------------------------------------------\n"
+                  << "> provided in the input file appears not to exist.\n"
+                  << "ASPECT will create it for you.\n"
+                  << "-----------------------------------------------------------------------------\n\n"
                   << std::endl;
-        std::exit (1);
+
+        // create the directory. we could call the 'mkdir()' function directly, but
+        // this can only create a single level of directories. if someone has specified
+        // a nested subdirectory as output directory, and if multiple parts of the path
+        // do not exist, this would fail. working around this is easiest by just calling
+        // 'mkdir -p' from the command line
+        const int error = system ((std::string("mkdir -p ") + output_directory).c_str());
+
+        AssertThrow (error==0,
+                     ExcMessage (std::string("Can't create the output directory at <") + output_directory + ">"));
       }
 
     surface_pressure              = prm.get_double ("Surface pressure");
