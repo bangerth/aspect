@@ -136,6 +136,36 @@ namespace aspect
         get_used_boundary_indicators () const = 0;
 
         /**
+         * Return a mapping from symbolic names of each part of the boundary
+         * to the corresponding boundary indicator. This allows users to
+         * specify *names*, not just *numbers* in their input files when
+         * describing which parts of the boundary have to satisfy which boundary
+         * conditions.
+         *
+         * An example would be that the "box" geometry returns a map of the form
+         * <code>{{"left"->0}, {"right"->1}, {"bottom"->2}, {"top"->3}}</code> in
+         * 2d.
+         *
+         * The default implementation of this function returns an empty map. This
+         * still allows the use of a geometry model that does not implement this
+         * function but forces the user to identify parts of the boundary by their
+         * boundary indicator number, rather than using a symbolic name.
+         *
+         * @note Names may contain spaces and numbers, but they may not contain
+         * special characters and they should not equal the text representation
+         * of numbers (e.g., a name "10" is ill-advised).
+         *
+         * @return A map from symbolic names to boundary indicators. The map
+         * should provide a symbolic name for each used boundary indicator as
+         * returned by get_user_boundary_indicators(). In the end, however, a
+         * geometry model may define multiple symbolic names for the same boundary
+         * or not define any.
+         */
+        virtual
+        std::map<std::string,types::boundary_id>
+        get_symbolic_boundary_names_map () const;
+
+        /**
          * Returns a set of periodic boundary pairs.  The elements of the set
          * are a pair of boundary ids and a cartesian unit direction each. The
          * base class returns an empty set, so this does nothing unless you

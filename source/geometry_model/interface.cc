@@ -32,10 +32,21 @@ namespace aspect
     Interface<dim>::~Interface ()
     {}
 
+
     template <int dim>
     void
     Interface<dim>::initialize ()
     {}
+
+
+    template<int dim>
+    std::map<std::string,types::boundary_id>
+    Interface<dim>::get_symbolic_boundary_names_map() const
+    {
+      //return an empty map in the base class
+      return std::map<std::string,types::boundary_id>();
+    }
+
 
     template<int dim>
     std::set< std::pair< std::pair<types::boundary_id, types::boundary_id>, unsigned int > >
@@ -44,6 +55,7 @@ namespace aspect
       //return an empty set in the base class
       return std::set< std::pair< std::pair< types::boundary_id, types::boundary_id>, unsigned int > >();
     }
+
 
     template <int dim>
     void
