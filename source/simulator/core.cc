@@ -77,6 +77,21 @@ namespace aspect
     }
   }
 
+
+  /**
+   * Constructor of the IntermediaryConstructorAction class. Since the
+   * class has no members, there is nothing to initialize -- all we
+   * need to do is execute the 'action' argument.
+   */
+  template <int dim>
+  Simulator<dim>::IntermediaryConstructorAction::
+  IntermediaryConstructorAction (std_cxx1x::function<void ()> action)
+  {
+    action();
+  }
+
+
+
   /**
    * Constructor. Initialize all member variables.
    **/
@@ -99,6 +114,13 @@ namespace aspect
                      TimerOutput::wall_times),
 
     geometry_model (GeometryModel::create_geometry_model<dim>(prm)),
+    // make sure the parameters object gets a chance to
+    // parse those parameters that depend on symbolic names
+    // for boundary components
+    post_geometry_model_creation_action (std_cxx1x::bind (&Parameters::parse_geometry_dependent_parameters,
+                                                          std_cxx1x::ref(parameters),
+                                                          std_cxx1x::ref(prm),
+                                                          geometry_model->get_symbolic_boundary_names_map())),
     material_model (MaterialModel::create_material_model<dim>(prm)),
     heating_model (HeatingModel::create_heating_model<dim>(prm)),
     gravity_model (GravityModel::create_gravity_model<dim>(prm)),
