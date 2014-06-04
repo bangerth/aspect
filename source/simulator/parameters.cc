@@ -1043,7 +1043,7 @@ namespace aspect
           std::string value = "";
 
           std::stringstream ss(*p);
-//todo. same on pressure-bc branch
+//todo: this place remains to be done. since the code is duplicated on pressure-bc branch, wait with this until the pressure-bc branch
           int b_id;
           ss >> b_id; // need to read as int, not char
           types::boundary_id boundary_id = b_id;
