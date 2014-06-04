@@ -865,6 +865,42 @@ namespace aspect
   namespace
   {
     /**
+     * For a given name of a boundary component, translate it to
+     * its numeric value -- either by using one of the symbolic values in the
+     * mapping, or by converting its string representation into a number.
+     *
+     * @param name A name or number (as string)
+     * @param boundary_names_mapping A mapping from allowed symbolic names to
+     *   their numeric values.
+     * @return A boundary indicator number corresponding to the given
+     *   name. If the name does not represent either
+     *   a symbolic name or a number, this function will throw an exception
+     *   of type std::string that explains the error.
+     */
+    types::boundary_id
+    translate_boundary_indicator (const std::string &name,
+                                  const std::map<std::string,types::boundary_id> &boundary_names_mapping)
+    {
+      // see if the given name is a symbolic one
+      if (boundary_names_mapping.find (name) != boundary_names_mapping.end())
+        return boundary_names_mapping.find(name)->second;
+      else
+        {
+          // if it wasn't a symbolic name, it better be a number. we would
+          // like to use Utilities::string_to_int, but as indicated by a
+          // comment in that function, as of mid-2014 the function does not
+          // do any error checking, so do it by hand here
+          char *p;
+          const long int boundary_id = std::strtol(name.c_str(), &p, 10);
+          if ((errno != 0) || (name.size() == 0) || ((name.size()>0) && (*p != '\0')))
+            throw std::string ("Could not convert from string <") + name + "> to a boundary indicator.";
+
+          // seems as if the conversion worked:
+          return boundary_id;
+        }
+    }
+
+    /**
      * For each one of the given names of boundary components, translate it to
      * its numeric value -- either by using one of the symbolic values in the
      * mapping, or by converting its string representation into a number.
@@ -879,31 +915,13 @@ namespace aspect
      */
     std::vector<types::boundary_id>
     translate_boundary_indicators (const std::vector<std::string> &names,
-        const std::map<std::string,types::boundary_id> &boundary_names_mapping)
+                                   const std::map<std::string,types::boundary_id> &boundary_names_mapping)
     {
-      std::vector<types::boundary_id> result;
+      std::vector<types::boundary_id> results;
       for (unsigned int i=0; i<names.size(); ++i)
-        {
-          // see if the given name is a symbolic one
-          if (boundary_names_mapping.find (names[i]) != boundary_names_mapping.end())
-            result.push_back (boundary_names_mapping.find(names[i])->second);
-          else
-            {
-              // if it wasn't a symbolic name, it better be a number. we would
-              // like to use Utilities::string_to_int, but as indicated by a
-              // comment in that function, as of mid-2014 the function does not
-              // do any error checking, so do it by hand here
-              char *p;
-              const long int boundary_id = std::strtol(names[i].c_str(), &p, 10);
-              if ((errno != 0) || (names.size() == 0) || ((names[i].size()>0) && (*p != '\0')))
-                throw std::string ("Could not convert from string <") + names[i] + "> to a boundary indicator";
+        results.push_back (translate_boundary_indicator(names[i], boundary_names_mapping));
 
-              // seems as if the conversion worked:
-              result.push_back (boundary_id);
-            }
-        }
-
-      return result;
+      return results;
     }
   }
 
@@ -916,52 +934,102 @@ namespace aspect
   {
     prm.enter_subsection ("Model settings");
     {
-      const std::vector<types::boundary_id> x_fixed_temperature_boundary_indicators
-        = translate_boundary_indicators
-          (Utilities::split_string_list
-           (prm.get ("Fixed temperature boundary indicators")),
-           boundary_names_mapping);
-      fixed_temperature_boundary_indicators
-        = std::set<types::boundary_id> (x_fixed_temperature_boundary_indicators.begin(),
-                                        x_fixed_temperature_boundary_indicators.end());
+      try
+        {
+          const std::vector<types::boundary_id> x_fixed_temperature_boundary_indicators
+            = translate_boundary_indicators
+              (Utilities::split_string_list
+               (prm.get ("Fixed temperature boundary indicators")),
+               boundary_names_mapping);
+          fixed_temperature_boundary_indicators
+            = std::set<types::boundary_id> (x_fixed_temperature_boundary_indicators.begin(),
+                                            x_fixed_temperature_boundary_indicators.end());
+        }
+      catch (const std::string &error)
+        {
+          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Fixed temperature "
+                                          "boundary indicators>, there was an error. Specifically, "
+                                          "the conversion function complained as follows: "
+                                          + error));
+        }
 
-      const std::vector<types::boundary_id> x_fixed_composition_boundary_indicators
-        = translate_boundary_indicators
-          (Utilities::split_string_list
-           (prm.get ("Fixed composition boundary indicators")),
-           boundary_names_mapping);
-      fixed_composition_boundary_indicators
-        = std::set<types::boundary_id> (x_fixed_composition_boundary_indicators.begin(),
-                                        x_fixed_composition_boundary_indicators.end());
+      try
+        {
+          const std::vector<types::boundary_id> x_fixed_composition_boundary_indicators
+            = translate_boundary_indicators
+              (Utilities::split_string_list
+               (prm.get ("Fixed composition boundary indicators")),
+               boundary_names_mapping);
+          fixed_composition_boundary_indicators
+            = std::set<types::boundary_id> (x_fixed_composition_boundary_indicators.begin(),
+                                            x_fixed_composition_boundary_indicators.end());
+        }
+      catch (const std::string &error)
+        {
+          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Fixed temperature "
+                                          "boundary indicators>, there was an error. Specifically, "
+                                          "the conversion function complained as follows: "
+                                          + error));
+        }
 
-      const std::vector<types::boundary_id> x_zero_velocity_boundary_indicators
-        = translate_boundary_indicators
-          (Utilities::split_string_list
-           (prm.get ("Zero velocity boundary indicators")),
-           boundary_names_mapping);
-      zero_velocity_boundary_indicators
-        = std::set<types::boundary_id> (x_zero_velocity_boundary_indicators.begin(),
-                                        x_zero_velocity_boundary_indicators.end());
+      try
+        {
+          const std::vector<types::boundary_id> x_zero_velocity_boundary_indicators
+            = translate_boundary_indicators
+              (Utilities::split_string_list
+               (prm.get ("Zero velocity boundary indicators")),
+               boundary_names_mapping);
+          zero_velocity_boundary_indicators
+            = std::set<types::boundary_id> (x_zero_velocity_boundary_indicators.begin(),
+                                            x_zero_velocity_boundary_indicators.end());
+        }
+      catch (const std::string &error)
+        {
+          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Fixed temperature "
+                                          "boundary indicators>, there was an error. Specifically, "
+                                          "the conversion function complained as follows: "
+                                          + error));
+        }
 
-      const std::vector<types::boundary_id> x_tangential_velocity_boundary_indicators
-        = translate_boundary_indicators
-          (Utilities::split_string_list
-           (prm.get ("Tangential velocity boundary indicators")),
-           boundary_names_mapping);
-      tangential_velocity_boundary_indicators
-        = std::set<types::boundary_id> (x_tangential_velocity_boundary_indicators.begin(),
-                                        x_tangential_velocity_boundary_indicators.end());
+      try
+        {
+          const std::vector<types::boundary_id> x_tangential_velocity_boundary_indicators
+            = translate_boundary_indicators
+              (Utilities::split_string_list
+               (prm.get ("Tangential velocity boundary indicators")),
+               boundary_names_mapping);
+          tangential_velocity_boundary_indicators
+            = std::set<types::boundary_id> (x_tangential_velocity_boundary_indicators.begin(),
+                                            x_tangential_velocity_boundary_indicators.end());
+        }
+      catch (const std::string &error)
+        {
+          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Fixed temperature "
+                                          "boundary indicators>, there was an error. Specifically, "
+                                          "the conversion function complained as follows: "
+                                          + error));
+        }
 
-      const std::vector<types::boundary_id> x_free_surface_boundary_indicators
-        = translate_boundary_indicators
-          (Utilities::split_string_list
-           (prm.get ("Free surface boundary indicators")),
-           boundary_names_mapping);
-      free_surface_boundary_indicators
-        = std::set<types::boundary_id> (x_free_surface_boundary_indicators.begin(),
-                                        x_free_surface_boundary_indicators.end());
+      try
+        {
+          const std::vector<types::boundary_id> x_free_surface_boundary_indicators
+            = translate_boundary_indicators
+              (Utilities::split_string_list
+               (prm.get ("Free surface boundary indicators")),
+               boundary_names_mapping);
+          free_surface_boundary_indicators
+            = std::set<types::boundary_id> (x_free_surface_boundary_indicators.begin(),
+                                            x_free_surface_boundary_indicators.end());
 
-      free_surface_enabled = !free_surface_boundary_indicators.empty();
+          free_surface_enabled = !free_surface_boundary_indicators.empty();
+        }
+      catch (const std::string &error)
+        {
+          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Fixed temperature "
+                                          "boundary indicators>, there was an error. Specifically, "
+                                          "the conversion function complained as follows: "
+                                          + error));
+        }
 
       const std::vector<std::string> x_prescribed_velocity_boundary_indicators
         = Utilities::split_string_list
