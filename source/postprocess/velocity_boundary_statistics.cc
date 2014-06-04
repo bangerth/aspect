@@ -31,6 +31,31 @@ namespace aspect
 {
   namespace Postprocess
   {
+    namespace
+    {
+      /**
+       * If the list of symbolic names for boundary components provides a name
+       * for a given boundary indicator, return it in the form '("name")' so
+       * that we can append it to the output.
+       *
+       * @param boundary_id A given boundary indicator.
+       * @param symbolic_name_map The mapping from symbolic names to boundary indicators.
+       * @return A string of the form outlined above, or an empty string if the name
+       *   was not found.
+       */
+      std::string possibly_get_boundary_name (const types::boundary_id boundary_id,
+                                              const std::map<std::string,types::boundary_id> &symbolic_name_map)
+      {
+        for (typename std::map<std::string,types::boundary_id>::const_iterator p=symbolic_name_map.begin();
+            p != symbolic_name_map.end(); ++p)
+          if (p->second == boundary_id)
+            return " (\"" + p->first + "\")";
+
+        return "";
+      }
+    }
+
+
     template <int dim>
     std::pair<std::string,std::string>
     VelocityBoundaryStatistics<dim>::execute (TableHandler &statistics)
@@ -142,10 +167,14 @@ namespace aspect
             {
               const std::string name_max = "Maximum velocity magnitude on boundary with indicator "
                                            + Utilities::int_to_string(p->first)
-                                           + " (m/yr)";
+                                           + possibly_get_boundary_name (p->first,
+                                                                         this->get_geometry_model().get_symbolic_boundary_names_map())
+                                       + " (m/yr)";
               statistics.add_value (name_max, p->second*year_in_seconds);
               const std::string name_min = "Minimum velocity magnitude on boundary with indicator "
                                            + Utilities::int_to_string(a->first)
+                                           + possibly_get_boundary_name (p->first,
+                                                                         this->get_geometry_model().get_symbolic_boundary_names_map())
                                            + " (m/yr)";
               statistics.add_value (name_min, a->second*year_in_seconds);
               // also make sure that the other columns filled by the this object
@@ -159,10 +188,14 @@ namespace aspect
             {
               const std::string name_max = "Maximum velocity magnitude on boundary with indicator "
                                            + Utilities::int_to_string(p->first)
+                                           + possibly_get_boundary_name (p->first,
+                                                                         this->get_geometry_model().get_symbolic_boundary_names_map())
                                            + " (m/s)";
               statistics.add_value (name_max, p->second);
               const std::string name_min = "Minimum velocity magnitude on boundary with indicator "
                                            + Utilities::int_to_string(a->first)
+                                           + possibly_get_boundary_name (p->first,
+                                                                         this->get_geometry_model().get_symbolic_boundary_names_map())
                                            + " (m/s)";
               statistics.add_value (name_min, a->second);
               // also make sure that the other columns filled by the this object
@@ -177,12 +210,14 @@ namespace aspect
           screen_text.precision(4);
           if (this->convert_output_to_years() == true)
             {
-              screen_text << p->second *year_in_seconds << " m/yr, " << a->second *year_in_seconds << " m/yr"
+              screen_text << p->second *year_in_seconds << " m/yr, "
+                          << a->second *year_in_seconds << " m/yr"
                           << (index == global_max_vel.size()-1 ? "" : ", ");
             }
           else
             {
-              screen_text << p->second << " m/s, " << a->second << " m/s"
+              screen_text << p->second << " m/s, "
+                          << a->second << " m/s"
                           << (index == global_max_vel.size()-1 ? "" : ", ");
             }
 
