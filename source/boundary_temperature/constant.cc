@@ -43,7 +43,10 @@ namespace aspect
         return it->second;
       else
         {
-          Assert (false, ExcMessage ("Unknown boundary indicator."));
+          Assert (false,
+		  ExcMessage ("Unknown boundary indicator with number <" + Utilities::int_to_string(bid) + ">. "
+			      "You may not have specified the temperature for this boundary indicator "
+			      "in the input file."));
           return std::numeric_limits<double>::quiet_NaN();
         }
     }
