@@ -23,6 +23,7 @@
 #define __aspect__boundary_temperature_constant_h
 
 #include <aspect/boundary_temperature/interface.h>
+#include <aspect/simulator_access.h>
 #include <map>
 
 
@@ -39,7 +40,7 @@ namespace aspect
      * @ingroup BoundaryTemperatures
      */
     template <int dim>
-    class Constant : public Interface<dim>
+    class Constant : public Interface<dim>, public SimulatorAccess<dim>
     {
       public:
         /**
@@ -96,11 +97,24 @@ namespace aspect
         void
         parse_parameters (ParameterHandler &prm);
 
+//TODO: get rid of this function again
+        virtual void initialize (const Simulator<dim> &simulator);
+
       private:
+//TODO: get rid of this variable again
+        /**
+         * Temperatures at the inner and outer boundaries. We use this variable
+	 * during parsing parameters since, at that point, we do not have access
+	 * to the simulator yet and so cannot ask the geometry model yet for the
+	 * names it declares. We therefore need to store what we find in the input
+	 * file until we have that information available.
+         */
+        std::map<std::string, double> boundary_temperatures_strings;
+
         /**
          * Temperatures at the inner and outer boundaries.
          */
-        std::map< types::boundary_id, double> boundary_temperatures;
+        std::map<types::boundary_id, double> boundary_temperatures;
     };
   }
 }
