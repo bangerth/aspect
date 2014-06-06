@@ -37,14 +37,13 @@ namespace aspect
                  const unsigned int                   boundary_indicator,
                  const Point<dim>                    &location) const
     {
-      types::boundary_id bid = boundary_indicator;
-      std::map< types::boundary_id, double>::const_iterator it = boundary_temperatures.find(bid);
+      const std::map<types::boundary_id, double>::const_iterator it = boundary_temperatures.find(boundary_indicator);
       if (it != boundary_temperatures.end())
         return it->second;
       else
         {
           Assert (false,
-		  ExcMessage ("Unknown boundary indicator with number <" + Utilities::int_to_string(bid) + ">. "
+		  ExcMessage ("Unknown boundary indicator with number <" + Utilities::int_to_string(boundary_indicator) + ">. "
 			      "You may not have specified the temperature for this boundary indicator "
 			      "in the input file."));
           return std::numeric_limits<double>::quiet_NaN();
