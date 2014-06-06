@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011, 2012 by the authors of the ASPECT code.
+  Copyright (C) 2011, 2012, 2014 by the authors of the ASPECT code.
 
   This file is part of ASPECT.
 
@@ -154,6 +154,14 @@ namespace aspect
          * @note Names may contain spaces and numbers, but they may not contain
          * special characters and they should not equal the text representation
          * of numbers (e.g., a name "10" is ill-advised).
+	 *
+	 * @note Since in practice boundary indicators can be provided either
+	 * via number or symbolic name, the mapping from something given in the
+	 * input is not entirely trivial -- in particular, because a function also
+	 * has to do some error checking that a given string in fact matches any
+	 * known boundary indicator. To this end, use
+	 * GeometryModel::translate_boundary_indicator() and
+	 * GeometryModel::translate_boundary_indicators().
          *
          * @return A map from symbolic names to boundary indicators. The map
          * should provide a symbolic name for each used boundary indicator as
@@ -196,6 +204,46 @@ namespace aspect
         parse_parameters (ParameterHandler &prm);
     };
 
+
+    /**
+     * For a given name of a boundary component, translate it to
+     * its numeric value -- either by using one of the symbolic values in the
+     * mapping, or by converting its string representation into a number.
+     *
+     * @param name A name or number (as string)
+     * @param boundary_names_mapping A mapping from allowed symbolic names to
+     *   their numeric values. This argument is typically provided by calling
+     *   an overloaded version of
+     *   GeometryModel::Interface::get_symbolic_boundary_names_map().
+     * @return A boundary indicator number corresponding to the given
+     *   name. If the name does not represent either
+     *   a symbolic name or a number, this function will throw an exception
+     *   of type std::string that explains the error.
+     */
+    types::boundary_id
+    translate_boundary_indicator (const std::string &name,
+                                  const std::map<std::string,types::boundary_id> &boundary_names_mapping);
+
+
+    /**
+     * For each one of the given names of boundary components, translate it to
+     * its numeric value -- either by using one of the symbolic values in the
+     * mapping, or by converting its string representation into a number.
+     *
+     * @param names A list of names or numbers (as strings)
+     * @param boundary_names_mapping A mapping from allowed symbolic names to
+     *   their numeric values. This argument is typically provided by calling
+     *   an overloaded version of
+     *   GeometryModel::Interface::get_symbolic_boundary_names_map().
+     * @return A list of boundary indicator numbers corresponding to the given
+     *   list of names. If one of the given names does not represent either
+     *   a symbolic name or a number, this function will throw an exception
+     *   of type std::string that explains the error.
+     */
+    std::vector<types::boundary_id>
+    translate_boundary_indicators (const std::vector<std::string> &names,
+                                   const std::map<std::string,types::boundary_id> &boundary_names_mapping);
+    
 
     /**
      * Register a geometry model so that it can be selected from the parameter
