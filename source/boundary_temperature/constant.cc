@@ -128,7 +128,7 @@ namespace aspect
                it != x_boundary_temperatures.end(); ++it)
             {
               // each entry has the format (white space is optional):
-              // <id> [x][y][z] : <value (might have spaces)>
+              // <id> : <value (might have spaces)>
               std::string comp = "";
               std::string value = "";
 
