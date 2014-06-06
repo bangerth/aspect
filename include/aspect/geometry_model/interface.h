@@ -210,7 +210,8 @@ namespace aspect
      * its numeric value -- either by using one of the symbolic values in the
      * mapping, or by converting its string representation into a number.
      *
-     * @param name A name or number (as string)
+     * @param name A name or number (as string). Leading and trailing spaces
+     *   are removed from this string.
      * @param boundary_names_mapping A mapping from allowed symbolic names to
      *   their numeric values. This argument is typically provided by calling
      *   an overloaded version of
@@ -230,7 +231,8 @@ namespace aspect
      * its numeric value -- either by using one of the symbolic values in the
      * mapping, or by converting its string representation into a number.
      *
-     * @param names A list of names or numbers (as strings)
+     * @param names A list of names or numbers (as strings). Leading and trailing spaces
+     *   are removed from the strings.
      * @param boundary_names_mapping A mapping from allowed symbolic names to
      *   their numeric values. This argument is typically provided by calling
      *   an overloaded version of

@@ -73,9 +73,16 @@ namespace aspect
     /* --------- functions to translate between symbolic and numeric boundary indicators ------ */    
 
     types::boundary_id
-    translate_boundary_indicator (const std::string &name,
+    translate_boundary_indicator (const std::string &name_,
                                   const std::map<std::string,types::boundary_id> &boundary_names_mapping)
     {
+      // trim whitespace on either side of the name if necessary
+      std::string name = name_;
+      while ((name.size() > 0) && (name[0] == ' '))
+	name.erase (name.begin());
+      while ((name.size() > 0) && (name[name.size()-1] == ' '))
+	name.erase (name.end());
+      
       // see if the given name is a symbolic one
       if (boundary_names_mapping.find (name) != boundary_names_mapping.end())
         return boundary_names_mapping.find(name)->second;
