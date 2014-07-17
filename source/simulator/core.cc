@@ -321,14 +321,14 @@ namespace aspect
         free_surface.reset( new FreeSurfaceHandler( *this, prm ) );
       }
 
-    postprocess_manager.parse_parameters (prm);
     postprocess_manager.initialize (*this);
+    postprocess_manager.parse_parameters (prm);
 
-    mesh_refinement_manager.parse_parameters (prm);
     mesh_refinement_manager.initialize (*this);
+    mesh_refinement_manager.parse_parameters (prm);
 
-    termination_manager.parse_parameters (prm);
     termination_manager.initialize (*this);
+    termination_manager.parse_parameters (prm);
 
     geometry_model->create_coarse_mesh (triangulation);
     global_Omega_diameter = GridTools::diameter (triangulation);
@@ -340,10 +340,10 @@ namespace aspect
       {
         VelocityBoundaryConditions::Interface<dim> *bv
           = VelocityBoundaryConditions::create_velocity_boundary_conditions<dim>
-            (p->second.second,
-             prm);
+            (p->second.second);
         if (dynamic_cast<SimulatorAccess<dim>*>(bv) != 0)
           dynamic_cast<SimulatorAccess<dim>*>(bv)->initialize(*this);
+        bv->parse_parameters (prm);
         bv->initialize ();
         velocity_boundary_conditions[p->first].reset (bv);
       }
