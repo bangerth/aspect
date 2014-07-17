@@ -60,13 +60,6 @@ namespace aspect
 // ------------------------------ Manager -----------------------------
 
     template <int dim>
-    void
-    Manager<dim>::initialize (const Simulator<dim> &simulator)
-    {
-      SimulatorAccess<dim>::initialize (simulator);
-    }
-
-    template <int dim>
     double Manager<dim>::check_for_last_time_step (const double time_step) const
     {
       double new_time_step = time_step;
