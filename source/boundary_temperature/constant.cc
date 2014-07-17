@@ -137,52 +137,32 @@ namespace aspect
 						   "<boundary_id components : name>, "
 						   "but there is an entry of the form <") + *it + ">"));
 
-              boundary_temperatures_strings[parts[0]] = Utilities::string_to_double(parts[1]);
+	      types::boundary_id boundary_id;
+	      try
+	      {
+	          boundary_id
+	          = GeometryModel::translate_boundary_indicator (parts[0],
+	                                                         this->get_geometry_model().get_symbolic_boundary_names_map());
+	      }
+	      catch (const std::string &error)
+	      {
+	          AssertThrow (false, ExcMessage ("While parsing the entry <Boundary temperature model/Constant>, "
+	              "there was an error. Specifically, "
+	              "the conversion function complained as follows: "
+	              + error));
+	      }
+
+	      AssertThrow (boundary_temperatures.find(boundary_id) == boundary_temperatures.end(),
+	                   ExcMessage ("Boundary indicator <" + Utilities::int_to_string(boundary_id) +
+	                       "> appears more than once in the list of indicators "
+	                       "for constant temperature boundary conditions."));
+
+	      boundary_temperatures[boundary_id] = Utilities::string_to_double (parts[1]);
             }
         }
         prm.leave_subsection ();
       }
       prm.leave_subsection ();
-    }
-
-
-    template <int dim>
-    void
-    Constant<dim>::initialize (const Simulator<dim> &simulator)
-    {
-      SimulatorAccess<dim>::initialize (simulator);
-      
-//TODO: get rid of this again once we have access to SimulatorAccess in parse_parameters()
-      // now parse the names of parameters
-      for (typename std::map<std::string, double>::const_iterator
-	     p = boundary_temperatures_strings.begin();
-	   p != boundary_temperatures_strings.end(); ++p)
-	{
-	  types::boundary_id boundary_id;
-	  try
-	    {
-	      boundary_id
-		= GeometryModel::translate_boundary_indicator (p->first,
-							       this->get_geometry_model().get_symbolic_boundary_names_map());
-	    }
-	  catch (const std::string &error)
-	    {
-	      AssertThrow (false, ExcMessage ("While parsing the entry <Boundary temperature model/Constant>, "
-					      "there was an error. Specifically, "
-					      "the conversion function complained as follows: "
-					      + error));
-	    }
-
-	  AssertThrow (boundary_temperatures.find(boundary_id) == boundary_temperatures.end(),
-		       ExcMessage ("Boundary indicator <" + Utilities::int_to_string(boundary_id) +
-				   "> appears more than once in the list of indicators "
-				   "for constant temperature boundary conditions."));
-
-	  boundary_temperatures[boundary_id] = p->second;
-	}
-
-      // we no longer need this now
-      boundary_temperatures_strings.clear ();
     }
   }
 }

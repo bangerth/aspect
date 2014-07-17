@@ -97,20 +97,7 @@ namespace aspect
         void
         parse_parameters (ParameterHandler &prm);
 
-//TODO: get rid of this function again
-        virtual void initialize (const Simulator<dim> &simulator);
-
       private:
-//TODO: get rid of this variable again
-        /**
-         * Temperatures at the inner and outer boundaries. We use this variable
-	 * during parsing parameters since, at that point, we do not have access
-	 * to the simulator yet and so cannot ask the geometry model yet for the
-	 * names it declares. We therefore need to store what we find in the input
-	 * file until we have that information available.
-         */
-        std::map<std::string, double> boundary_temperatures_strings;
-
         /**
          * Temperatures at the inner and outer boundaries.
          */
