@@ -274,6 +274,9 @@ namespace aspect
      * object that describes it. Ownership of the pointer is transferred to
      * the caller.
      *
+     * The geometry model will also be asked to read its runtime parameters
+     * already.
+     *
      * @ingroup GeometryModels
      */
     template <int dim>

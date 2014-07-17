@@ -250,12 +250,21 @@ namespace aspect
 
     // if any plugin wants access to the Simulator by deriving from SimulatorAccess, initialize it and
     // call the initialize() functions immediately after.
+    //
+    // we also need to let all models parse their parameters. this is done *after* setting
+    // up their SimulatorAccess base class so that they can query, for example, the
+    // geometry model's description of symbolic names for boundary parts. note that
+    // the geometry model is the only model whose runtime parameters are already read
+    // at the time it is created
     if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(geometry_model.get()))
       sim->initialize (*this);
     geometry_model->initialize ();
+
     if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(material_model.get()))
       sim->initialize (*this);
+    material_model->parse_parameters (prm);
     material_model->initialize ();
+
     if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(heating_model.get()))
       sim->initialize (*this);
     heating_model->initialize ();
