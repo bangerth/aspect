@@ -267,30 +267,47 @@ namespace aspect
 
     if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(heating_model.get()))
       sim->initialize (*this);
+    heating_model->parse_parameters (prm);
     heating_model->initialize ();
+
     if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(gravity_model.get()))
       sim->initialize (*this);
+    gravity_model->parse_parameters (prm);
     gravity_model->initialize ();
+
     if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(boundary_temperature.get()))
       sim->initialize (*this);
+    boundary_temperature->parse_parameters (prm);
     boundary_temperature->initialize ();
+
     if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(boundary_composition.get()))
       sim->initialize (*this);
     if (boundary_composition.get())
-      boundary_composition->initialize ();
+      {
+        boundary_composition->parse_parameters (prm);
+        boundary_composition->initialize ();
+      }
+
     if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(initial_conditions.get()))
       sim->initialize (*this);
+    initial_conditions->parse_parameters (prm);
     initial_conditions->initialize ();
+
     if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(compositional_initial_conditions.get()))
       sim->initialize (*this);
     if (compositional_initial_conditions.get())
-      compositional_initial_conditions->initialize ();
+      {
+        compositional_initial_conditions->parse_parameters (prm);
+        compositional_initial_conditions->initialize ();
+      }
+
     if (SimulatorAccess<dim> *sim = dynamic_cast<SimulatorAccess<dim>*>(adiabatic_conditions.get()))
       sim->initialize (*this);
+    adiabatic_conditions->parse_parameters (prm);
     adiabatic_conditions->initialize ();
 
 
-    //Initialize the free surface handler
+    // Initialize the free surface handler
     if (parameters.free_surface_enabled)
       {
         //It should be possible to make the free surface work with any of a number of nonlinear
