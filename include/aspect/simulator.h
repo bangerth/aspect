@@ -199,9 +199,10 @@ namespace aspect
          * This function is called from the GeometryModel::create_geometry() function.
          *
          * @param prm The object from which to obtain the run-time parameters.
+         * @param geometry_model The geometry model that provides boundary names etc.
          */
         void parse_geometry_dependent_parameters (ParameterHandler &prm,
-                                                  const std::map<std::string,types::boundary_id> &boundary_names_mapping);
+                                                  const GeometryModel::Interface<dim> &geometry_model);
 
         /**
          * @name Global parameters

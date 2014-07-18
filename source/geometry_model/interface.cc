@@ -72,46 +72,68 @@ namespace aspect
 
     /* --------- functions to translate between symbolic and numeric boundary indicators ------ */    
 
-    types::boundary_id
-    translate_boundary_indicator (const std::string &name_,
-                                  const std::map<std::string,types::boundary_id> &boundary_names_mapping)
+    namespace
     {
-      // trim whitespace on either side of the name if necessary
-      std::string name = name_;
-      while ((name.size() > 0) && (name[0] == ' '))
-	name.erase (name.begin());
-      while ((name.size() > 0) && (name[name.size()-1] == ' '))
-	name.erase (name.end());
-      
-      // see if the given name is a symbolic one
-      if (boundary_names_mapping.find (name) != boundary_names_mapping.end())
-        return boundary_names_mapping.find(name)->second;
-      else
-        {
-          // if it wasn't a symbolic name, it better be a number. we would
-          // like to use Utilities::string_to_int, but as indicated by a
-          // comment in that function, as of mid-2014 the function does not
-          // do any error checking, so do it by hand here
-          char *p;
-          const long int boundary_id = std::strtol(name.c_str(), &p, 10);
-          if ((errno != 0) || (name.size() == 0) || ((name.size()>0) && (*p != '\0')))
-            throw std::string ("Could not convert from string <") + name + "> to a boundary indicator.";
+      types::boundary_id
+      translate_boundary_indicator (const std::string &name_,
+                                    const std::map<std::string,types::boundary_id> &boundary_names_mapping)
+      {
+        // trim whitespace on either side of the name if necessary
+        std::string name = name_;
+        while ((name.size() > 0) && (name[0] == ' '))
+          name.erase (name.begin());
+        while ((name.size() > 0) && (name[name.size()-1] == ' '))
+          name.erase (name.end());
 
-          // seems as if the conversion worked:
-          return boundary_id;
-        }
+        // see if the given name is a symbolic one
+        if (boundary_names_mapping.find (name) != boundary_names_mapping.end())
+          return boundary_names_mapping.find(name)->second;
+        else
+          {
+            // if it wasn't a symbolic name, it better be a number. we would
+            // like to use Utilities::string_to_int, but as indicated by a
+            // comment in that function, as of mid-2014 the function does not
+            // do any error checking, so do it by hand here
+            char *p;
+            const long int boundary_id = std::strtol(name.c_str(), &p, 10);
+            if ((errno != 0) || (name.size() == 0) || ((name.size()>0) && (*p != '\0')))
+              throw std::string ("Could not convert from string <") + name + "> to a boundary indicator.";
+
+            // seems as if the conversion worked:
+            return boundary_id;
+          }
+      }
+
+
+      std::vector<types::boundary_id>
+      translate_boundary_indicators (const std::vector<std::string> &names,
+          const std::map<std::string,types::boundary_id> &boundary_names_mapping)
+      {
+        std::vector<types::boundary_id> results;
+        for (unsigned int i=0; i<names.size(); ++i)
+          results.push_back (translate_boundary_indicator(names[i], boundary_names_mapping));
+
+        return results;
+      }
     }
 
 
-    std::vector<types::boundary_id>
-    translate_boundary_indicators (const std::vector<std::string> &names,
-                                   const std::map<std::string,types::boundary_id> &boundary_names_mapping)
+    template <int dim>
+    types::boundary_id
+    Interface<dim>::
+    translate_symbolic_boundary_name (const std::string &name) const
     {
-      std::vector<types::boundary_id> results;
-      for (unsigned int i=0; i<names.size(); ++i)
-        results.push_back (translate_boundary_indicator(names[i], boundary_names_mapping));
+      return translate_boundary_indicator(name, get_symbolic_boundary_names_map());
+    }
 
-      return results;
+
+
+    template <int dim>
+    std::vector<types::boundary_id>
+    Interface<dim>::
+    translate_symbolic_boundary_names (const std::vector<std::string> &names) const
+    {
+      return translate_boundary_indicators(names, get_symbolic_boundary_names_map());
     }
     
 

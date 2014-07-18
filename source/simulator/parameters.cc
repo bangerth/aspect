@@ -866,17 +866,15 @@ namespace aspect
   void
   Simulator<dim>::Parameters::
   parse_geometry_dependent_parameters(ParameterHandler &prm,
-                                      const std::map<std::string,types::boundary_id> &boundary_names_mapping)
+                                      const GeometryModel::Interface<dim> &geometry_model)
   {
     prm.enter_subsection ("Model settings");
     {
       try
         {
           const std::vector<types::boundary_id> x_fixed_temperature_boundary_indicators
-            = GeometryModel::translate_boundary_indicators
-              (Utilities::split_string_list
-               (prm.get ("Fixed temperature boundary indicators")),
-               boundary_names_mapping);
+            = geometry_model.translate_symbolic_boundary_names(Utilities::split_string_list
+                (prm.get ("Fixed temperature boundary indicators")));
           fixed_temperature_boundary_indicators
             = std::set<types::boundary_id> (x_fixed_temperature_boundary_indicators.begin(),
                                             x_fixed_temperature_boundary_indicators.end());
@@ -892,10 +890,8 @@ namespace aspect
       try
         {
           const std::vector<types::boundary_id> x_fixed_composition_boundary_indicators
-            = GeometryModel::translate_boundary_indicators
-              (Utilities::split_string_list
-               (prm.get ("Fixed composition boundary indicators")),
-               boundary_names_mapping);
+            = geometry_model.translate_symbolic_boundary_names (Utilities::split_string_list
+               (prm.get ("Fixed composition boundary indicators")));
           fixed_composition_boundary_indicators
             = std::set<types::boundary_id> (x_fixed_composition_boundary_indicators.begin(),
                                             x_fixed_composition_boundary_indicators.end());
@@ -911,10 +907,8 @@ namespace aspect
       try
         {
           const std::vector<types::boundary_id> x_zero_velocity_boundary_indicators
-            = GeometryModel::translate_boundary_indicators
-              (Utilities::split_string_list
-               (prm.get ("Zero velocity boundary indicators")),
-               boundary_names_mapping);
+            = geometry_model.translate_symbolic_boundary_names(Utilities::split_string_list
+               (prm.get ("Zero velocity boundary indicators")));
           zero_velocity_boundary_indicators
             = std::set<types::boundary_id> (x_zero_velocity_boundary_indicators.begin(),
                                             x_zero_velocity_boundary_indicators.end());
@@ -930,10 +924,8 @@ namespace aspect
       try
         {
           const std::vector<types::boundary_id> x_tangential_velocity_boundary_indicators
-            = GeometryModel::translate_boundary_indicators
-              (Utilities::split_string_list
-               (prm.get ("Tangential velocity boundary indicators")),
-               boundary_names_mapping);
+            = geometry_model.translate_symbolic_boundary_names(Utilities::split_string_list
+               (prm.get ("Tangential velocity boundary indicators")));
           tangential_velocity_boundary_indicators
             = std::set<types::boundary_id> (x_tangential_velocity_boundary_indicators.begin(),
                                             x_tangential_velocity_boundary_indicators.end());
@@ -949,10 +941,8 @@ namespace aspect
       try
         {
           const std::vector<types::boundary_id> x_free_surface_boundary_indicators
-            = GeometryModel::translate_boundary_indicators
-              (Utilities::split_string_list
-               (prm.get ("Free surface boundary indicators")),
-               boundary_names_mapping);
+            = geometry_model.translate_symbolic_boundary_names(Utilities::split_string_list
+               (prm.get ("Free surface boundary indicators")));
           free_surface_boundary_indicators
             = std::set<types::boundary_id> (x_free_surface_boundary_indicators.begin(),
                                             x_free_surface_boundary_indicators.end());
@@ -1045,7 +1035,7 @@ namespace aspect
   template void Simulator<dim>::Parameters::parse_parameters(ParameterHandler &prm, \
                                                              const MPI_Comm mpi_communicator); \
   template void Simulator<dim>::Parameters::parse_geometry_dependent_parameters(ParameterHandler &prm, \
-                                                                                const std::map<std::string,types::boundary_id> &boundary_names_mapping); \
+                                                                                const GeometryModel::Interface<dim> &geometry_model); \
   template void Simulator<dim>::declare_parameters (ParameterHandler &prm);
 
   ASPECT_INSTANTIATE(INSTANTIATE)

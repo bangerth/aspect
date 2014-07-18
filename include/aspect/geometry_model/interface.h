@@ -174,6 +174,38 @@ namespace aspect
         get_symbolic_boundary_names_map () const;
 
         /**
+         * For a given name of a boundary component, translate it to
+         * its numeric value -- either by using one of the symbolic values in the
+         * mapping that derived classes provide through the get_symbolic_boundary_names_map()
+         * function, or by converting its string representation into a number.
+         *
+         * @param name A name or number (as string). Leading and trailing spaces
+         *   are removed from this string.
+         * @return A boundary indicator number corresponding to the given
+         *   name. If the name does not represent either
+         *   a symbolic name or a number, this function will throw an exception
+         *   of type std::string that explains the error.
+         */
+        types::boundary_id
+        translate_symbolic_boundary_name (const std::string &name) const;
+
+        /**
+         * For each one of the given names of boundary components, translate it to
+         * its numeric value -- either by using one of the symbolic values in the
+         * mapping that derived classes provide through the get_symbolic_boundary_names_map()
+         * function, or by converting its string representation into a number.
+         *
+         * @param names A list of names or numbers (as strings). Leading and trailing spaces
+         *   are removed from the strings.
+         * @return A list of boundary indicator numbers corresponding to the given
+         *   list of names. If one of the given names does not represent either
+         *   a symbolic name or a number, this function will throw an exception
+         *   of type std::string that explains the error.
+         */
+        std::vector<types::boundary_id>
+        translate_symbolic_boundary_names (const std::vector<std::string> &names) const;
+
+        /**
          * Returns a set of periodic boundary pairs.  The elements of the set
          * are a pair of boundary ids and a cartesian unit direction each. The
          * base class returns an empty set, so this does nothing unless you
@@ -205,47 +237,6 @@ namespace aspect
     };
 
 
-    /**
-     * For a given name of a boundary component, translate it to
-     * its numeric value -- either by using one of the symbolic values in the
-     * mapping, or by converting its string representation into a number.
-     *
-     * @param name A name or number (as string). Leading and trailing spaces
-     *   are removed from this string.
-     * @param boundary_names_mapping A mapping from allowed symbolic names to
-     *   their numeric values. This argument is typically provided by calling
-     *   an overloaded version of
-     *   GeometryModel::Interface::get_symbolic_boundary_names_map().
-     * @return A boundary indicator number corresponding to the given
-     *   name. If the name does not represent either
-     *   a symbolic name or a number, this function will throw an exception
-     *   of type std::string that explains the error.
-     */
-    types::boundary_id
-    translate_boundary_indicator (const std::string &name,
-                                  const std::map<std::string,types::boundary_id> &boundary_names_mapping);
-
-
-    /**
-     * For each one of the given names of boundary components, translate it to
-     * its numeric value -- either by using one of the symbolic values in the
-     * mapping, or by converting its string representation into a number.
-     *
-     * @param names A list of names or numbers (as strings). Leading and trailing spaces
-     *   are removed from the strings.
-     * @param boundary_names_mapping A mapping from allowed symbolic names to
-     *   their numeric values. This argument is typically provided by calling
-     *   an overloaded version of
-     *   GeometryModel::Interface::get_symbolic_boundary_names_map().
-     * @return A list of boundary indicator numbers corresponding to the given
-     *   list of names. If one of the given names does not represent either
-     *   a symbolic name or a number, this function will throw an exception
-     *   of type std::string that explains the error.
-     */
-    std::vector<types::boundary_id>
-    translate_boundary_indicators (const std::vector<std::string> &names,
-                                   const std::map<std::string,types::boundary_id> &boundary_names_mapping);
-    
 
     /**
      * Register a geometry model so that it can be selected from the parameter

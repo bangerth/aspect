@@ -120,7 +120,7 @@ namespace aspect
     post_geometry_model_creation_action (std_cxx1x::bind (&Parameters::parse_geometry_dependent_parameters,
                                                           std_cxx1x::ref(parameters),
                                                           std_cxx1x::ref(prm),
-                                                          geometry_model->get_symbolic_boundary_names_map())),
+                                                          std_cxx1x::cref(*geometry_model))),
     material_model (MaterialModel::create_material_model<dim>(prm)),
     heating_model (HeatingModel::create_heating_model<dim>(prm)),
     gravity_model (GravityModel::create_gravity_model<dim>(prm)),
