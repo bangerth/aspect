@@ -83,7 +83,7 @@ namespace aspect
         while ((name.size() > 0) && (name[0] == ' '))
           name.erase (name.begin());
         while ((name.size() > 0) && (name[name.size()-1] == ' '))
-          name.erase (name.end());
+          name.erase (name.end()-1);
 
         // see if the given name is a symbolic one
         if (boundary_names_mapping.find (name) != boundary_names_mapping.end())
