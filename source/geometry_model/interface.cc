@@ -93,7 +93,8 @@ namespace aspect
             // if it wasn't a symbolic name, it better be a number. we would
             // like to use Utilities::string_to_int, but as indicated by a
             // comment in that function, as of mid-2014 the function does not
-            // do any error checking, so do it by hand here
+            // do any error checking, so do it by hand here. (this was fixed
+            // in late July 2014, so should work in deal.II 8.2.)
             char *p;
             const long int boundary_id = std::strtol(name.c_str(), &p, 10);
             if ((errno != 0) || (name.size() == 0) || ((name.size()>0) && (*p != '\0')))
