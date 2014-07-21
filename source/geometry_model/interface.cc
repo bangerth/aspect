@@ -122,7 +122,7 @@ namespace aspect
     template <int dim>
     types::boundary_id
     Interface<dim>::
-    translate_symbolic_boundary_name (const std::string &name) const
+    translate_symbolic_boundary_name_to_id (const std::string &name) const
     {
       return translate_boundary_indicator(name, get_symbolic_boundary_names_map());
     }
@@ -132,11 +132,33 @@ namespace aspect
     template <int dim>
     std::vector<types::boundary_id>
     Interface<dim>::
-    translate_symbolic_boundary_names (const std::vector<std::string> &names) const
+    translate_symbolic_boundary_names_to_ids (const std::vector<std::string> &names) const
     {
       return translate_boundary_indicators(names, get_symbolic_boundary_names_map());
     }
     
+
+    template <int dim>
+    std::string
+    Interface<dim>::
+    translate_id_to_symbol_name(const types::boundary_id boundary_id) const
+    {
+      const std::map<std::string,types::boundary_id> mapping = get_symbolic_boundary_names_map());
+      std::string name;
+      for (std::map<std::string,types::boundary_id>::const_iterator p = mapping.begin();
+          p != mapping.end(); ++p)
+        if (p->second == boundary_id)
+          {
+            Assert (name == "",
+                    ExcMessage ("This material model appears to provide multiple "
+                                "names for the boundary with indicator <" +
+                                Utilities::int_to_string (boundary_id) + ">."));
+            name = p->first;
+          }
+
+      return name;
+    }
+
 
 // -------------------------------- Deal with registering geometry models and automating
 // -------------------------------- their setup and selection at run time

@@ -141,7 +141,7 @@ namespace aspect
 	      try
 	      {
 	          boundary_id
-	          = this->get_geometry_model().translate_symbolic_boundary_name (parts[0]);
+	          = this->get_geometry_model().translate_symbolic_boundary_name_to_id (parts[0]);
 	      }
 	      catch (const std::string &error)
 	      {

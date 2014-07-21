@@ -187,7 +187,7 @@ namespace aspect
          *   of type std::string that explains the error.
          */
         types::boundary_id
-        translate_symbolic_boundary_name (const std::string &name) const;
+        translate_symbolic_boundary_name_to_id (const std::string &name) const;
 
         /**
          * For each one of the given names of boundary components, translate it to
@@ -203,7 +203,18 @@ namespace aspect
          *   of type std::string that explains the error.
          */
         std::vector<types::boundary_id>
-        translate_symbolic_boundary_names (const std::vector<std::string> &names) const;
+        translate_symbolic_boundary_names_to_ids (const std::vector<std::string> &names) const;
+
+        /**
+         * Given a boundary indicator, try and see whether this geometry model
+         * provides a symbolic name for it. If the geometry model does not provide
+         * a symbolic name, return the empty string.
+         *
+         * @param boundary_id The boundary indicator to be translated.
+         * @return A string representation for this boundary indicator, if one is available.
+         */
+        std::string
+        translate_id_to_symbol_name (const types::boundary_id boundary_id) const;
 
         /**
          * Returns a set of periodic boundary pairs.  The elements of the set

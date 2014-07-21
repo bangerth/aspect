@@ -873,7 +873,7 @@ namespace aspect
       try
         {
           const std::vector<types::boundary_id> x_fixed_temperature_boundary_indicators
-            = geometry_model.translate_symbolic_boundary_names(Utilities::split_string_list
+            = geometry_model.translate_symbolic_boundary_names_to_ids(Utilities::split_string_list
                 (prm.get ("Fixed temperature boundary indicators")));
           fixed_temperature_boundary_indicators
             = std::set<types::boundary_id> (x_fixed_temperature_boundary_indicators.begin(),
@@ -890,7 +890,7 @@ namespace aspect
       try
         {
           const std::vector<types::boundary_id> x_fixed_composition_boundary_indicators
-            = geometry_model.translate_symbolic_boundary_names (Utilities::split_string_list
+            = geometry_model.translate_symbolic_boundary_names_to_ids (Utilities::split_string_list
                (prm.get ("Fixed composition boundary indicators")));
           fixed_composition_boundary_indicators
             = std::set<types::boundary_id> (x_fixed_composition_boundary_indicators.begin(),
@@ -907,7 +907,7 @@ namespace aspect
       try
         {
           const std::vector<types::boundary_id> x_zero_velocity_boundary_indicators
-            = geometry_model.translate_symbolic_boundary_names(Utilities::split_string_list
+            = geometry_model.translate_symbolic_boundary_names_to_ids(Utilities::split_string_list
                (prm.get ("Zero velocity boundary indicators")));
           zero_velocity_boundary_indicators
             = std::set<types::boundary_id> (x_zero_velocity_boundary_indicators.begin(),
@@ -924,7 +924,7 @@ namespace aspect
       try
         {
           const std::vector<types::boundary_id> x_tangential_velocity_boundary_indicators
-            = geometry_model.translate_symbolic_boundary_names(Utilities::split_string_list
+            = geometry_model.translate_symbolic_boundary_names_to_ids(Utilities::split_string_list
                (prm.get ("Tangential velocity boundary indicators")));
           tangential_velocity_boundary_indicators
             = std::set<types::boundary_id> (x_tangential_velocity_boundary_indicators.begin(),
@@ -941,7 +941,7 @@ namespace aspect
       try
         {
           const std::vector<types::boundary_id> x_free_surface_boundary_indicators
-            = geometry_model.translate_symbolic_boundary_names(Utilities::split_string_list
+            = geometry_model.translate_symbolic_boundary_names_to_ids(Utilities::split_string_list
                (prm.get ("Free surface boundary indicators")));
           free_surface_boundary_indicators
             = std::set<types::boundary_id> (x_free_surface_boundary_indicators.begin(),
