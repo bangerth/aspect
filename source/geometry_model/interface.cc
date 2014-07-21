@@ -143,7 +143,7 @@ namespace aspect
     Interface<dim>::
     translate_id_to_symbol_name(const types::boundary_id boundary_id) const
     {
-      const std::map<std::string,types::boundary_id> mapping = get_symbolic_boundary_names_map());
+      const std::map<std::string,types::boundary_id> mapping = get_symbolic_boundary_names_map();
       std::string name;
       for (std::map<std::string,types::boundary_id>::const_iterator p = mapping.begin();
           p != mapping.end(); ++p)
