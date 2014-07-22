@@ -37,20 +37,20 @@ namespace aspect
        * for a given boundary indicator, return it in the form '("name")' so
        * that we can append it to the output.
        *
+       * @param geometry_model The geometry model to query
        * @param boundary_id A given boundary indicator.
-       * @param symbolic_name_map The mapping from symbolic names to boundary indicators.
        * @return A string of the form outlined above, or an empty string if the name
        *   was not found.
        */
-      std::string possibly_get_boundary_name (const types::boundary_id boundary_id,
-                                              const std::map<std::string,types::boundary_id> &symbolic_name_map)
+      template <int dim>
+      std::string possibly_get_boundary_name (const GeometryModel::Interface<dim> &geometry_model,
+                                              const types::boundary_id boundary_id)
       {
-        for (typename std::map<std::string,types::boundary_id>::const_iterator p=symbolic_name_map.begin();
-            p != symbolic_name_map.end(); ++p)
-          if (p->second == boundary_id)
-            return " (\"" + p->first + "\")";
-
-        return "";
+        const std::string s = geometry_model.translate_id_to_symbol_name (boundary_id);
+        if (s.size() > 0)
+          return " (\"" + s + "\")";
+        else
+          return "";
       }
     }
 
@@ -177,8 +177,7 @@ namespace aspect
         {
           const std::string name = "Outward heat flux through boundary with indicator "
                                    + Utilities::int_to_string(p->first)
-                                   + possibly_get_boundary_name (p->first,
-                                                                 this->get_geometry_model().get_symbolic_boundary_names_map())
+                                   + possibly_get_boundary_name (this->get_geometry_model(), p->first)
                                    + " (W)";
           statistics.add_value (name, p->second);
 
