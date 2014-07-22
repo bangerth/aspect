@@ -103,6 +103,8 @@ namespace aspect
                              "boundary indicators. The format for this list is "
                              "``indicator1 : value1, indicator2 : value2, ...'', "
                              "where each indicator is a valid boundary indicator "
+                             "(either a number or the symbolic name of a boundary as provided "
+                             "by the geometry model) "
                              "and each value is the temperature of that boundary." );
         }
         prm.leave_subsection ();
@@ -134,7 +136,7 @@ namespace aspect
 	      AssertThrow (parts.size() == 2,
 			   ExcMessage (std::string("Invalid entry trying to describe boundary "
 						   "temperatures. Each entry needs to have the form "
-						   "<boundary_id components : name>, "
+						   "<boundary_id : name>, "
 						   "but there is an entry of the form <") + *it + ">"));
 
 	      types::boundary_id boundary_id;
