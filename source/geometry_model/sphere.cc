@@ -160,6 +160,6 @@ namespace aspect
                                    "Geometry model for sphere with a user specified radius. This geometry "
 				   "has only a single boundary, so the only valid boundary indicator to "
 				   "specify in the input file is ``0''. It can also be referenced by the "
-				   "symbolic name ``surface''.")
+				   "symbolic name ``surface'' in input files.")
   }
 }
