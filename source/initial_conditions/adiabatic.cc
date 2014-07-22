@@ -257,9 +257,9 @@ namespace aspect
               catch (...)
                 {
                   std::cerr << "ERROR: FunctionParser failed to parse\n"
-                            << "\t'Initial conditions.Adiabatic.Function'\n"
+                            << "\t<Initial conditions/Adiabatic/Function>\n"
                             << "with expression\n"
-                            << "\t'" << prm.get("Function expression") << "'";
+                            << "\t<" << prm.get("Function expression") << ">";
                   throw;
                 }
 
