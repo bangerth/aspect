@@ -898,7 +898,7 @@ namespace aspect
         }
       catch (const std::string &error)
         {
-          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Fixed temperature "
+          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Fixed composition "
                                           "boundary indicators>, there was an error. Specifically, "
                                           "the conversion function complained as follows: "
                                           + error));
@@ -915,7 +915,7 @@ namespace aspect
         }
       catch (const std::string &error)
         {
-          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Fixed temperature "
+          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Zero velocity "
                                           "boundary indicators>, there was an error. Specifically, "
                                           "the conversion function complained as follows: "
                                           + error));
@@ -932,7 +932,7 @@ namespace aspect
         }
       catch (const std::string &error)
         {
-          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Fixed temperature "
+          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Tangential velocity "
                                           "boundary indicators>, there was an error. Specifically, "
                                           "the conversion function complained as follows: "
                                           + error));
@@ -951,7 +951,7 @@ namespace aspect
         }
       catch (const std::string &error)
         {
-          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Fixed temperature "
+          AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Free surface "
                                           "boundary indicators>, there was an error. Specifically, "
                                           "the conversion function complained as follows: "
                                           + error));
