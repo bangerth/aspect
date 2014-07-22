@@ -284,6 +284,6 @@ namespace aspect
                                    "indicators 0 through 5 indicate left, right, front, back, bottom "
                                    "and top boundaries (see also the documentation of the deal.II class "
                                    "``GeometryInfo''). You can also use symbolic names ``left'', ``right'',"
-                                   "etc., to refer to these boundaries.")
+                                   "etc., to refer to these boundaries in input files.")
   }
 }

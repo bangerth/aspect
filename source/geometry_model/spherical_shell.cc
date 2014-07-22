@@ -286,6 +286,7 @@ namespace aspect
                                    "intersection of a spherical shell and the first octant, "
                                    "then indicator 2 is at the face $x=0$, 3 at $y=0$, "
                                    "and 4 at $z=0$. These last three boundaries can then also "
-                                   "be referred to as 'east', 'west' and 'south' symbolically.")
+                                   "be referred to as 'east', 'west' and 'south' symbolically "
+                                   "in input files.")
   }
 }
