@@ -59,7 +59,7 @@ namespace aspect
     get_symbolic_boundary_names_map () const
     {
       static const std::pair<std::string,types::boundary_id> mapping
-	= {"surface", 0};
+	= { std::make_pair<std::string,types::boundary_id> ("surface", 0) };
       return std::map<std::string,types::boundary_id> (&mapping,
 						       &mapping+1);
     }
