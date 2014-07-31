@@ -113,7 +113,10 @@ namespace aspect
       case 2:
         {
           static const std::pair<std::string,types::boundary_id> mapping[]
-          = { {"inner", 0}, {"outer", 1}, {"left", 2}, {"right", 3} };
+          = { std::pair<std::string,types::boundary_id> ("inner", 0),
+	      std::pair<std::string,types::boundary_id> ("outer", 1),
+	      std::pair<std::string,types::boundary_id> ("left",  2),
+	      std::pair<std::string,types::boundary_id> ("right", 3) };
 
           if (phi == 360)
             return std::map<std::string,types::boundary_id> (&mapping[0],
@@ -128,7 +131,8 @@ namespace aspect
           if (phi == 360)
             {
               static const std::pair<std::string,types::boundary_id> mapping[]
-              = { {"inner", 0}, {"outer", 1} };
+		= { std::pair<std::string,types::boundary_id>("inner", 0),
+		    std::pair<std::string,types::boundary_id>("outer", 1) };
 
               return std::map<std::string,types::boundary_id> (&mapping[0],
                                                                &mapping[2]);
@@ -136,7 +140,11 @@ namespace aspect
           else if (phi == 90)
             {
               static const std::pair<std::string,types::boundary_id> mapping[]
-              = { {"inner", 0}, {"outer", 1}, {"east", 2}, {"west", 3}, {"south", 4} };
+		= { std::pair<std::string,types::boundary_id>("inner", 0),
+		    std::pair<std::string,types::boundary_id>("outer", 1),
+		    std::pair<std::string,types::boundary_id>("east",  2),
+		    std::pair<std::string,types::boundary_id>("west",  3),
+		    std::pair<std::string,types::boundary_id>("south", 4) };
 
               return std::map<std::string,types::boundary_id> (&mapping[0],
                                                                &mapping[5]);

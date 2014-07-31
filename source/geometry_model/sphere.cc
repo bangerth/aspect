@@ -58,8 +58,7 @@ namespace aspect
     Sphere<dim>::
     get_symbolic_boundary_names_map () const
     {
-      static const std::pair<std::string,types::boundary_id> mapping
-	= { std::make_pair<std::string,types::boundary_id> ("surface", 0) };
+      static const std::pair<std::string,types::boundary_id> mapping("surface", 0);
       return std::map<std::string,types::boundary_id> (&mapping,
 						       &mapping+1);
     }
