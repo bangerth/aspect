@@ -403,7 +403,7 @@ namespace aspect
                          "of the letters 'xyz' that allows you to apply the boundary conditions "
                          "only to the components listed. As an example, '1 y: function' applies "
                          "the type 'function' to the y component on boundary 1. Without a selector "
-                         "it will effect all components of the velocity."
+                         "it will affect all components of the velocity."
                          "\n\n"
                          "Note that the no-slip boundary condition is "
                          "a special case of the current one where the prescribed velocity "
@@ -965,36 +965,83 @@ namespace aspect
         {
           // each entry has the format (white space is optional):
           // <id> [x][y][z] : <value (might have spaces)>
-          std::string comp = "";
-          std::string value = "";
+	  //
+	  // first tease apart the two halves
+	  const std::vector<std::string> split_parts = Utilities::split_string_list (*p, ':');
+	  AssertThrow (split_parts.size() == 2,
+		       ExcMessage ("The format for prescribed velocity boundary indicators "
+				   "requires that each entry has the form `"
+				   "<id> [x][y][z] : <value>', but there does not "
+				   "appear to be a colon in the entry <"
+				   + *p
+				   + ">."));
 
-          std::stringstream ss(*p);
-//todo: this place remains to be done. since the code is duplicated on pressure-bc branch, wait with this until the pressure-bc branch
-          int b_id;
-          ss >> b_id; // need to read as int, not char
-          types::boundary_id boundary_id = b_id;
+	  // the easy part: get the value
+	  const std::string value = split_parts[1];
 
-          char c;
-          while (ss.peek()==' ') ss.get(c); // eat spaces
+	  // now for the rest. since we don't know whether there is a
+	  // component selector, start reading at the end and subtracting
+	  // letters x, y and zs
+	  std::string key_and_comp = split_parts[0];
+	  std::string comp;
+	  while ((key_and_comp.size()>0) &&
+		 ((key_and_comp[key_and_comp.size()-1] == 'x')
+		  ||
+		  (key_and_comp[key_and_comp.size()-1] == 'y')
+		  ||
+		  ((key_and_comp[key_and_comp.size()-1] == 'z') && (dim==3))))
+	    {
+	      comp += key_and_comp[key_and_comp.size()-1];
+	      key_and_comp.erase (--key_and_comp.end());
+	    }
 
-          if (ss.peek()!=':')
-            {
-              std::getline(ss,comp,':');
-              while (comp.length()>0 && *(--comp.end())==' ')
-                comp.erase(comp.length()-1); // remove whitespace at the end
-            }
-          else
-            ss.get(c); // read the ':'
+	  // we've stopped reading component selectors now. there are three
+	  // possibilities:
+	  // - no characters are left. this means that key_and_comp only
+	  //   consisted of a single word that only consisted of 'x', 'y'
+	  //   and 'z's. then this would have been a mistake to classify
+	  //   as a component selector, and we better undo it
+	  // - the last character of key_and_comp is not a whitespace. this
+	  //   means that the last word in key_and_comp ended in an 'x', 'y'
+	  //   or 'z', but this was not meant to be a component selector.
+	  //   in that case, put these characters back.
+	  // - otherwise, we split successfully. eat spaces that may be at
+	  //   the end of key_and_comp to get key
+	  if (key_and_comp.size() == 0)
+	    key_and_comp.swap (comp);
+	  else if (key_and_comp[key_and_comp.size()-1] != ' ')
+	    {
+	      key_and_comp += comp;
+	      comp = "";
+	    }
+	  else
+	    {
+	      while ((key_and_comp.size()>0) && (key_and_comp[key_and_comp.size()-1] == ' '))
+		key_and_comp.erase (--key_and_comp.end());
+	    }
 
-          while (ss.peek()==' ') ss.get(c); // eat spaces
-
-          std::getline(ss,value); // read until the end of the string
+	  // finally, try to translate the key into a boundary_id. then
+	  // make sure we haven't see it yet
+	  types::boundary_id boundary_id;
+	  try
+	    {
+	      boundary_id = geometry_model.translate_symbolic_boundary_name_to_id(key_and_comp);
+	    }
+	  catch (const std::string &error)
+	    {
+	      AssertThrow (false, ExcMessage ("While parsing the entry <Model settings/Prescribed "
+					      "velocity indicators>, there was an error. Specifically, "
+					      "the conversion function complained as follows: "
+					      + error));
+	    }
 
           AssertThrow (prescribed_velocity_boundary_indicators.find(boundary_id)
                        == prescribed_velocity_boundary_indicators.end(),
                        ExcMessage ("Boundary indicator <" + Utilities::int_to_string(boundary_id) +
                                    "> appears more than once in the list of indicators "
                                    "for nonzero velocity boundaries."));
+
+	  // finally, put it into the list
           prescribed_velocity_boundary_indicators[boundary_id] =
             std::pair<std::string,std::string>(comp,value);
         }
