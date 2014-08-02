@@ -149,6 +149,11 @@ namespace aspect
     translate_id_to_symbol_name(const types::boundary_id boundary_id) const
     {
       const std::map<std::string,types::boundary_id> mapping = get_symbolic_boundary_names_map();
+
+      // loop over all entries in the map, and set 'name' to the key if the
+      // value matches the given 'boundary_id'. if 'name' has already been
+      // set, then this means that we had previously already found it -- i.e.,
+      // that it is in the map at least twice. produce an error in that case.
       std::string name;
       for (std::map<std::string,types::boundary_id>::const_iterator p = mapping.begin();
           p != mapping.end(); ++p)
