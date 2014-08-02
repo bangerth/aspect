@@ -2071,8 +2071,9 @@ with the input file discussed in Section~\ref{sec:cookbooks-simple-box},
 simulating convection in a box. After running \aspect{}, you will find
 a file called \texttt{statistics} in the output directory that, at the time
 of writing this, looked like this:
-This file has a structure that looks like this:
-  \begin{lstlisting}[frame=single,language=ksh]
+This file has a structure that looks (at the time of writing this section)
+like this:
+\begin{lstlisting}[frame=single,language=ksh]
 # 1: Time step number
 # 2: Time (seconds)
 # 3: Number of mesh cells
@@ -2098,7 +2099,7 @@ This file has a structure that looks like this:
    3 1.7991e-02 256 2467 1089 19 15 1.3658e-03 1.61586242e+01 2.28690070e+01 ...
    4 1.9357e-02 256 2467 1089 16 14 1.0291e-03 2.14311381e+01 3.03519178e+01 ...
    5 2.0386e-02 256 2467 1089 14 14 8.2853e-04 2.65966688e+01 3.76989179e+01 ...
-  \end{lstlisting}
+\end{lstlisting}
 
 In other words, it first lists what the individual columns mean with a hash
 mark at the beginning of the line and then has one line for each time step
