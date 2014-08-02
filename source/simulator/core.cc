@@ -213,8 +213,16 @@ namespace aspect
                                    boundary_indicator_lists[j].end(),
                                    std::inserter(intersection, intersection.end()));
             AssertThrow (intersection.empty(),
-                         ExcMessage ("Some velocity boundary indicators are listed as having more "
-                                     "than one type in the input file."));
+                         ExcMessage ("Boundary indicator <"
+				     +
+				     Utilities::int_to_string(*intersection.begin())
+				     +
+				     "> with symbolic name <"
+				     +
+				     geometry_model->translate_id_to_symbol_name (*intersection.begin())
+				     +
+				     "> is listed as having more "
+                                     "than one type of velocity boundary condition in the input file."));
           }
 
       // next make sure that all listed indicators are actually used by
@@ -612,26 +620,40 @@ namespace aspect
 
           // here we create a mask for interpolate_boundary_values out of the 'selector'
           std::vector<bool> mask(introspection.component_masks.velocities.size(), false);
-          Assert(introspection.component_masks.velocities[0]==true, ExcInternalError()); // in case we ever move the velocity around
+          Assert(introspection.component_masks.velocities[0]==true,
+		 ExcInternalError()); // in case we ever move the velocity around
           const std::string &comp = parameters.prescribed_velocity_boundary_indicators[p->first].first;
 
           if (comp.length()>0)
             {
               for (std::string::const_iterator direction=comp.begin(); direction!=comp.end(); ++direction)
                 {
-                  AssertThrow(*direction>='x' && *direction<='z', ExcMessage("Error in selector of prescribed velocity boundary component"));
-                  AssertThrow(dim==3 || *direction!='z', ExcMessage("for dim=2, prescribed velocity component z is invalid"))
-                  mask[*direction-'x']=true;
+		  switch (*director)
+		    {
+		    case 'x':
+			  mask[0] = true;
+			  break;
+		    case 'y':
+			  mask[1] = true;
+			  break;
+		    case 'z':
+			  // we must be in 3d, or 'z' should never have gotten through
+			  Assert (dim==3, ExcInternalError());
+			  mask[2] = true;
+			  break;
+		    default:
+			  Assert (false, ExcInternalError());
+		    }
                 }
-              for (unsigned int i=0; i<introspection.component_masks.velocities.size(); ++i)
-                mask[i] = mask[i] & introspection.component_masks.velocities[i];
             }
           else
             {
+	      // no mask given -- take all velocities 
               for (unsigned int i=0; i<introspection.component_masks.velocities.size(); ++i)
                 mask[i]=introspection.component_masks.velocities[i];
 
-              Assert(introspection.component_masks.velocities[0]==true, ExcInternalError()); // in case we ever move the velocity down
+              Assert(introspection.component_masks.velocities[0]==true,
+		     ExcInternalError()); // in case we ever move the velocity down
             }
 
           VectorTools::interpolate_boundary_values (dof_handler,
