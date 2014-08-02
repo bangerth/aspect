@@ -95,7 +95,12 @@ namespace aspect
             // comment in that function, as of mid-2014 the function does not
             // do any error checking, so do it by hand here. (this was fixed
             // in late July 2014, so should work in deal.II 8.2.)
+	    //
+	    // since we test for errno, we need to make sure it is zero before
+	    // or otherwise the conversion may succeed and strtol will just
+	    // leave it where it was.
             char *p;
+	    errno = 0;
             const long int boundary_id = std::strtol(name.c_str(), &p, 10);
             if ((errno != 0) || (name.size() == 0) || ((name.size()>0) && (*p != '\0')))
               throw std::string ("Could not convert from string <") + name + "> to a boundary indicator.";
