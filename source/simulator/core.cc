@@ -628,7 +628,7 @@ namespace aspect
             {
               for (std::string::const_iterator direction=comp.begin(); direction!=comp.end(); ++direction)
                 {
-		  switch (*director)
+		  switch (*direction)
 		    {
 		    case 'x':
 			  mask[0] = true;
