@@ -2699,6 +2699,30 @@ $y$-directions. Of course, there are other geometries you can choose from for
 the \texttt{Model name} parameter, and consequently other subsections that
 specify the details of these geometries.
 
+Similarly, you describe boundary conditions using parameters such as this:
+%
+\lstinputlisting[language=prmfile]{cookbooks/overview/boundary-conditions.part.prm}
+%
+This snippet describes which of the four boundaries of the two-dimensional box
+we have selected above should have a prescribed temperature or an insulating
+boundary, and at which parts of the boundary we want zero, tangential or
+prescribed velocities.%
+\footnote{Internally, the geometry models \aspect{} uses label every part of
+  the boundary with what is called a \textit{boundary indicator} -- a number
+  that identifies pieces of the boundary. If you know which number each piece
+  has, you can list these numbers on the right hand sides of the assignments
+  of boundary types above. For example, the left boundary of the box has
+  boundary indicator zero (see Section~\ref{parameters:Geometry_20model}), and
+  using this number instead of the \texttt{left} would have been equally
+  valid. However, numbers are far more difficult to remember than names, and
+  consequently every geometry model provides string aliases such as
+  ``\texttt{left}'' for each boundary indicator describing parts of the
+  boundary. These symbolic aliases are specific to the geometry -- for the
+  box, they are ``\texttt{left}'', ``\texttt{right}'', ``\texttt{bottom}'',
+  etc., whereas for a spherical shell they are ``\texttt{inner}'' and
+  ``\texttt{outer}'' -- but are described in the documentation of every
+  geometry model, see Section~\ref{parameters:Geometry_20model}.}
+
 If you go down the list of questions about the setup above, you have already
 done the majority of the work describing your computation. The remaining
 parameters you will typically want to specify have to do with the computation
