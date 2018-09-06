@@ -462,10 +462,16 @@ namespace aspect
          * before a refinement step. All particles have to be attached to their
          * cell to be sent around to the new processes.
          */
+#if DEAL_II_VERSION_GTE(9,1,0)
+        std::vector<char>
+        store_particles(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &cell,
+                        const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus status) const;
+#else
         void
         store_particles(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &cell,
                         const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus status,
                         void *data) const;
+#endif
 
         /**
          * Called by listener functions after a refinement step. The local map

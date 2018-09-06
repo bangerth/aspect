@@ -181,9 +181,11 @@ namespace aspect
       triangulation.save ((parameters.output_directory + "restart.mesh").c_str());
     }
 
-    // save general information This calls the serialization functions on all
-    // processes (so that they can take additional action, if necessary, see
-    // the manual) but only writes to the restart file on process 0
+    // Save general information
+    //
+    // This calls the serialization functions on all processes (so that they
+    // can take additional action, if necessary, see the manual) but only
+    // writes to the restart file on process 0
     {
       std::ostringstream oss;
 

@@ -22,6 +22,7 @@
 
 #include <deal.II/grid/grid_tools.h>
 
+
 namespace aspect
 {
   namespace Particle
@@ -829,6 +830,16 @@ namespace aspect
 
       if (global_max_particles_per_cell > 0)
         {
+#if DEAL_II_VERSION_GTE(9,1,0)
+          auto callback_function = [&](const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
+              const typename parallel::distributed::Triangulation<dim>::CellStatus status) -> std::vector<char>
+          {
+            return this->store_particles(cell, status);
+          };
+
+          data_offset = non_const_triangulation->register_data_attach (callback_function,
+                                                                       /*returns_variable_size_data=*/true);
+#else
           auto callback_function = [&](const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
                                        const typename parallel::distributed::Triangulation<dim>::CellStatus status,
                                        void *data)
@@ -859,6 +870,7 @@ namespace aspect
                                                       std::pow(2,dim));
 
           data_offset = non_const_triangulation->register_data_attach(transfer_size_per_cell,callback_function);
+#endif
         }
     }
 
@@ -881,6 +893,9 @@ namespace aspect
       // data correctly. Only do this if something was actually stored.
       if (serialization && (global_max_particles_per_cell > 0))
         {
+#if DEAL_II_VERSION_GTE(9,1,0)
+          (void)non_const_triangulation;
+#else
           auto callback_function =
             [&] (const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &cell,
                  const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus status,
@@ -888,6 +903,7 @@ namespace aspect
           {
             this->store_particles(cell, status, data);
           };
+
 
           // Compute the size per serialized particle. This is simple if we own
           // particles, simply ask one of them. Otherwise create a temporary particle,
@@ -904,12 +920,16 @@ namespace aspect
           // space for the data in case a cell is coarsened
           const std::size_t transfer_size_per_cell = sizeof (unsigned int) +
                                                      (size_per_particle * global_max_particles_per_cell);
-          data_offset = non_const_triangulation->register_data_attach(transfer_size_per_cell, callback_function);
+          data_offset = non_const_triangulation->register_data_attach(transfer_size_per_cell,
+                                                                      callback_function);
+#endif
         }
 
       // Check if something was stored and load it
       if (data_offset != numbers::invalid_unsigned_int)
         {
+#if DEAL_II_VERSION_GTE(9,1,0)
+#else
           auto callback_function =
             [&] (const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &cell,
                  const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus status,
@@ -919,6 +939,7 @@ namespace aspect
           };
 
           non_const_triangulation->notify_ready_to_unpack(data_offset, callback_function);
+#endif
 
           // Reset offset and update global number of particles. The number
           // can change because of discarded or newly generated particles
@@ -928,16 +949,73 @@ namespace aspect
     }
 
 
+#if DEAL_II_VERSION_GTE(9,1,0)
+    template <int dim, int spacedim>
+    std::vector<char>
+    ParticleHandler<dim,spacedim>::store_particles(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &cell,
+                                                   const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus status) const
+    {
+      std::ostringstream oss;
 
+      // Serialize into a stringstream
+      aspect::oarchive oa (oss);
+
+      // If the cell persists or is refined store all particles of the current cell.
+      if (status == parallel::distributed::Triangulation<dim,spacedim>::CELL_PERSIST
+          || status == parallel::distributed::Triangulation<dim,spacedim>::CELL_REFINE)
+        {
+          const boost::iterator_range<particle_iterator> particle_range
+            = particles_in_cell(cell);
+
+          // Leave a note in the stream about the number of particles found
+          // in the rest of the buffer
+          unsigned int n_particles = std::distance(particle_range.begin(),particle_range.end());
+          oa << n_particles;
+
+          for (auto &particle : particle_range)
+            oa << particle;
+        }
+      else if (status == parallel::distributed::Triangulation<dim,spacedim>::CELL_COARSEN)
+        // If this cell is the parent of children that will be coarsened, collect
+        // the particles of all children.
+        {
+          unsigned int n_particles = 0;
+
+          for (unsigned int child_index = 0; child_index < GeometryInfo<dim>::max_children_per_cell; ++child_index)
+            {
+              const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator child = cell->child(child_index);
+              n_particles += n_particles_in_cell(child);
+            }
+
+          // Leave a note in the stream about the number of particles found
+          // in the rest of the buffer
+          oa << n_particles;
+
+          for (unsigned int child_index = 0; child_index < GeometryInfo<dim>::max_children_per_cell; ++child_index)
+            {
+              const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator child = cell->child(child_index);
+              const boost::iterator_range<particle_iterator> particle_range
+                = particles_in_cell(child);
+
+              for (auto &particle : particle_range)
+                oa << particle;
+            }
+        }
+      else
+        Assert (false, ExcInternalError());
+
+      return Utilities::pack (oss.str());
+    }
+#else
     template <int dim, int spacedim>
     void
     ParticleHandler<dim,spacedim>::store_particles(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &cell,
                                                    const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus status,
                                                    void *data) const
     {
-      unsigned int n_particles(0);
+      unsigned int n_particles = 0;
 
-      // If the cell persist or is refined store all particles of the current cell.
+      // If the cell persists or is refined store all particles of the current cell.
       if (status == parallel::distributed::Triangulation<dim,spacedim>::CELL_PERSIST
           || status == parallel::distributed::Triangulation<dim,spacedim>::CELL_REFINE)
         {
@@ -955,9 +1033,9 @@ namespace aspect
               particle->write_data(data);
             }
         }
-      // If this cell is the parent of children that will be coarsened, collect
-      // the particles of all children.
       else if (status == parallel::distributed::Triangulation<dim,spacedim>::CELL_COARSEN)
+        // If this cell is the parent of children that will be coarsened, collect
+        // the particles of all children.
         {
           for (unsigned int child_index = 0; child_index < GeometryInfo<dim>::max_children_per_cell; ++child_index)
             {
@@ -985,9 +1063,12 @@ namespace aspect
         }
       else
         Assert (false, ExcInternalError());
-
     }
+#endif
 
+
+#if DEAL_II_VERSION_GTE(9,1,0)
+#else
     template <int dim, int spacedim>
     void
     ParticleHandler<dim,spacedim>::load_particles(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -1094,6 +1175,7 @@ namespace aspect
             }
         }
     }
+#endif
   }
 }
 
